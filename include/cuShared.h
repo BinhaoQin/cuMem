@@ -2,6 +2,7 @@
 #define __cuShared_cuh__
 
 #include "cuBase.h"
+#include <new>
 
 template <typename T> class alignas(alignof(T)) SharedSegment {
 protected:
