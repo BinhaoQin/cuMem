@@ -1,7 +1,7 @@
 #ifndef __cuManaged_cuh__
 #define __cuManaged_cuh__
 
-#include "cuManagedAllocator.cuh"
+#include "cuManagedAllocator.h"
 
 template <typename T, bool use_new = true> class Managed {
 protected:

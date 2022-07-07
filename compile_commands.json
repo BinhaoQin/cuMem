@@ -19,9 +19,9 @@
    "-lrt",
    "-lpthread",
    "-o",
-   "build/shared_test",
-   "test/shared_test.cu"
+   "build/basic_test",
+   "test/basic_test.cu"
   ],
-  "file": "test/shared_test.cu"
+  "file": "test/basic_test.cu"
  }
 ]

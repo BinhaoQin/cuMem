@@ -1,7 +1,8 @@
 #ifndef __cuManagedAllocator_cuh__
 #define __cuManagedAllocator_cuh__
 
-#include "cuBase.cuh"
+#include "cuBase.h"
+#include <new>
 
 template <typename T> class ManagedAllocator {
 public:

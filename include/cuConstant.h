@@ -1,7 +1,7 @@
 #ifndef __cuConstant_cuh__
 #define __cuConstant_cuh__
 
-#include "cuBase.cuh"
+#include "cuBase.h"
 
 template <typename T, const T &device_symbol> class Constant {
 public:
