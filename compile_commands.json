@@ -1,0 +1,27 @@
+[
+ {
+  "directory": "/home/bhqin/Documents/ROAHM/cuMem",
+  "arguments": [
+   "clang++",
+   "-Wall",
+   "-std=c++17",
+   "-stdlib=libc++",
+   "-Iinclude",
+   "-g",
+   "--cuda-gpu-arch=sm_86",
+   "-Xclang",
+   "-fcuda-allow-variadic-functions",
+   "-I/opt/cuda/include",
+   "-L/opt/cuda/lib64",
+   "-lcuda",
+   "-lcudart",
+   "-ldl",
+   "-lrt",
+   "-lpthread",
+   "-o",
+   "build/shared_test",
+   "test/shared_test.cu"
+  ],
+  "file": "test/shared_test.cu"
+ }
+]

@@ -1,0 +1,6 @@
+.vscode
+.cache
+.clangd
+.nvim
+build
+*.o
