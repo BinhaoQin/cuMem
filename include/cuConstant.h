@@ -2,6 +2,7 @@
 #define __cuConstant_cuh__
 
 #include "cuBase.h"
+#include "cuShared.h"
 
 template <typename T, const T &device_symbol> class Constant {
 public:

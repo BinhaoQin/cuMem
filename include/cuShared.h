@@ -4,7 +4,10 @@
 #include "cuBase.h"
 #include <new>
 
-template <typename T> class alignas(alignof(T)) SharedSegment {
+// Segment<T> is a template class that emulates the memory layout of T
+// but strips off T's type info and manually add it later on.
+// The purpose is solely to bybass constructor.
+template <typename T> class alignas(alignof(T)) Segment {
 protected:
   char __data[sizeof(T)];
 
@@ -33,6 +36,11 @@ public:
   DEVICE_INDEPENDENT operator T &(void) { return reference(); }
 
   DEVICE_INDEPENDENT operator const T &(void) const { return reference(); }
+};
+
+template <typename T> class DeferredInit {
+public:
+  Segment<T> segment;
 };
 
 #endif
