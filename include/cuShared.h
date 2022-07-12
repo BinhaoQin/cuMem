@@ -38,9 +38,4 @@ public:
   DEVICE_INDEPENDENT operator const T &(void) const { return reference(); }
 };
 
-template <typename T> class DeferredInit {
-public:
-  Segment<T> segment;
-};
-
 #endif
