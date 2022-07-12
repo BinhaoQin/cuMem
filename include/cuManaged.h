@@ -35,6 +35,10 @@ public:
     return cuAssert(cudaMemPrefetchAsync(ptr, sizeof(T), device, stream));
   }
 
+  cudaError_t advise(enum cudaMemoryAdvise adv, int device) const {
+    return cuAssert(cudaMemAdvise(ptr, sizeof(T), adv, device));
+  }
+
   DEVICE_INDEPENDENT T *release(void) {
     T *temp = ptr;
     ptr = nullptr;
