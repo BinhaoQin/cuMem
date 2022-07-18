@@ -5,6 +5,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
+#include <stdexcept>
 
 #ifndef DEVICE_INDEPENDENT
 #define DEVICE_INDEPENDENT __host__ __device__
@@ -15,6 +16,7 @@ DEVICE_INDEPENDENT inline cudaError_t cuErrorCheck(cudaError_t error_code,
   if (error_code != cudaSuccess) {
     fprintf(stderr, "CUDA Assertion Failed: %s at %s:%d\n",
             cudaGetErrorString(error_code), file, line);
+    throw std::runtime_error("CUDA Assertion Failed");
   }
   return error_code;
 }
