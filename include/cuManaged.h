@@ -6,22 +6,30 @@
 template <typename T, bool use_new = true> class Managed {
 protected:
   T *ptr;
-  ManagedAllocator<T> allocator;
 
 public:
+  using allocator = ManagedAllocator<T>;
+
   template <typename... Args>
-  DEVICE_INDEPENDENT Managed(Args &&...args) : ptr(nullptr), allocator() {
+  DEVICE_INDEPENDENT Managed(Args &&...args) : ptr(nullptr) {
     if constexpr (use_new)
-      ptr = allocator.construct(args...);
+      ptr = allocator::construct(args...);
     else
-      ptr = allocator.allocate();
+      ptr = allocator::allocate();
+  }
+
+  template <typename... Args>
+  DEVICE_INDEPENDENT Managed(enum cudaMemoryAdvise adv, int device,
+                             Args &&...args)
+      : Managed<T>(args...) {
+    this->advise(adv, device);
   }
 
   DEVICE_INDEPENDENT ~Managed() {
     if constexpr (use_new)
-      allocator.destruct(ptr);
+      allocator::destruct(ptr);
     else
-      allocator.deallocate(ptr);
+      allocator::deallocate(ptr);
     ptr = nullptr;
   }
 
@@ -35,7 +43,8 @@ public:
     return cuAssert(cudaMemPrefetchAsync(ptr, sizeof(T), device, stream));
   }
 
-  cudaError_t advise(enum cudaMemoryAdvise adv, int device) const {
+  inline cudaError_t advise(enum cudaMemoryAdvise adv,
+                            int device = cudaCpuDeviceId) const {
     return cuAssert(cudaMemAdvise(ptr, sizeof(T), adv, device));
   }
 
