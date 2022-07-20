@@ -18,13 +18,6 @@ public:
       ptr = allocator::allocate();
   }
 
-  template <typename... Args>
-  DEVICE_INDEPENDENT Managed(enum cudaMemoryAdvise adv, int device,
-                             Args &&...args)
-      : Managed<T>(args...) {
-    this->advise(adv, device);
-  }
-
   DEVICE_INDEPENDENT ~Managed() {
     if constexpr (use_new)
       allocator::destruct(ptr);
