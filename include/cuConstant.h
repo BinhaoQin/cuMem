@@ -58,6 +58,8 @@ protected:
   T cache_mem;
 
 public:
+  using Base = Constant<T, device_symbol>;
+
   template <typename... Args>
   DEVICE_INDEPENDENT ConstantCached(Args &&...args) : cache_mem(args...) {}
 
@@ -65,10 +67,10 @@ public:
 
   DEVICE_INDEPENDENT T &cache(void) { return cache_mem; }
 
-  inline cudaError_t commit() const { return this->commit(cache()); }
+  inline cudaError_t commit() const { return this->Base::commit(cache()); }
 
   DEVICE_INDEPENDENT inline cudaError_t fetch() const {
-    return this->fetch(cache_mem);
+    return this->Base::fetch(cache_mem);
   }
 };
 
