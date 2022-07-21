@@ -1,9 +1,19 @@
+#include "cuConstant.h"
 #include "cuManaged.h"
 #include "cuShared.h"
 #include <array>
 
 #include <cooperative_groups.h>
 #include <iostream>
+
+class Int {
+public:
+  int value;
+
+  DEVICE_INDEPENDENT Int() : value(0) {}
+};
+
+__constant__ Segment<Int> translation;
 
 template <typename T, std::size_t N>
 __global__ void vec_add(std::array<T, N> &result, const std::array<T, N> &left,
@@ -22,6 +32,9 @@ int main(int argc, char *argv[]) {
   Managed<std::array<double, 3>> left(initial);
   Managed<std::array<double, 3>> right(displacement);
   Managed<std::array<double, 3>, false> result;
+  Int i;
+  Constant<Segment<Int>, translation> shadow;
+  shadow.commit(i);
   vec_add<<<1, 3>>>(result.reference(), left.reference(), right.reference());
   cudaDeviceSynchronize();
   assert(result.reference()[0] == 5);

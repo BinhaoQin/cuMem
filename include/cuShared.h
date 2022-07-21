@@ -12,6 +12,8 @@ protected:
   char __data[sizeof(T)];
 
 public:
+  using Type = T;
+
   template <typename... Args>
   DEVICE_INDEPENDENT void init(const Args &...args) {
     new (__data) T(args...);
