@@ -4,51 +4,67 @@
 #include "cuBase.h"
 #include "cuShared.h"
 
-namespace internal {
-
-template <typename T, const T &device_symbol> class ConstantImpl {
+template <typename T, const T &device_symbol> class Constant {
 public:
-  DEVICE_INDEPENDENT constexpr const T &symbol(void) const {
+  DEVICE_INDEPENDENT static constexpr const T &symbol(void) {
     return device_symbol;
   }
 
-  DEVICE_INDEPENDENT const T &reference(void) const {
+  DEVICE_INDEPENDENT static const T &reference(void) {
     const T *address = nullptr;
     cuAssert(cudaGetSymbolAddress((void **)(&address), symbol()));
     return *address;
   }
 
-  inline cudaError_t commit(const T &host_mem) const {
+  static inline cudaError_t commit(const T &host_mem) {
     return cuAssert(cudaMemcpyToSymbolAsync(symbol(), &host_mem, sizeof(T)));
   }
 
-  inline cudaError_t fetch(T &host_mem) const {
+  static inline cudaError_t fetch(T &host_mem) {
     return cuAssert(cudaMemcpyFromSymbolAsync(&host_mem, symbol(), sizeof(T)));
   }
 
-  __device__ inline cudaError_t fetch(T &host_mem) const {
+  __device__ static inline cudaError_t fetch(T &host_mem) {
     return cuAssert(cudaMemcpyFromSymbolAsync(&host_mem, symbol(), sizeof(T), 0,
                                               cudaMemcpyDeviceToDevice));
   }
 };
 
-} // namespace internal
+template <typename U, const Segment<U> &device_symbol>
+class Constant<Segment<U>, device_symbol> {
+protected:
+  using T = Segment<U>;
 
-template <typename T, const T &device_symbol>
-class Constant : public internal::ConstantImpl<T, device_symbol> {};
-
-template <typename T, const Segment<T> &device_symbol>
-class Constant<Segment<T>, device_symbol>
-    : public internal::ConstantImpl<Segment<T>, device_symbol> {
 public:
-  using Base = internal::ConstantImpl<Segment<T>, device_symbol>;
-
-  inline cudaError_t commit(const T &host_mem) const {
-    return this->Base::commit(reinterpret_cast<const Segment<T> &>(host_mem));
+  DEVICE_INDEPENDENT static constexpr const T &symbol(void) {
+    return device_symbol;
   }
 
-  DEVICE_INDEPENDENT inline cudaError_t fetch(T &host_mem) const {
-    return this->Base::fetch(reinterpret_cast<const Segment<T> &>(host_mem));
+  DEVICE_INDEPENDENT static const T &reference(void) {
+    const T *address = nullptr;
+    cuAssert(cudaGetSymbolAddress((void **)(&address), symbol()));
+    return *address;
+  }
+
+  static inline cudaError_t commit(const T &host_mem) {
+    return cuAssert(cudaMemcpyToSymbolAsync(symbol(), &host_mem, sizeof(T)));
+  }
+
+  static inline cudaError_t fetch(T &host_mem) {
+    return cuAssert(cudaMemcpyFromSymbolAsync(&host_mem, symbol(), sizeof(T)));
+  }
+
+  __device__ static inline cudaError_t fetch(T &host_mem) {
+    return cuAssert(cudaMemcpyFromSymbolAsync(&host_mem, symbol(), sizeof(T), 0,
+                                              cudaMemcpyDeviceToDevice));
+  }
+
+  static inline cudaError_t commit(const U &host_mem) {
+    return commit(reinterpret_cast<const Segment<T> &>(host_mem));
+  }
+
+  DEVICE_INDEPENDENT static inline cudaError_t fetch(U &host_mem) {
+    return fetch(reinterpret_cast<const Segment<T> &>(host_mem));
   }
 };
 
@@ -67,10 +83,10 @@ public:
 
   DEVICE_INDEPENDENT T &cache(void) { return cache_mem; }
 
-  inline cudaError_t commit() const { return this->Base::commit(cache()); }
+  inline cudaError_t commit() const { return Base::commit(cache()); }
 
   DEVICE_INDEPENDENT inline cudaError_t fetch() const {
-    return this->Base::fetch(cache_mem);
+    return Base::fetch(cache_mem);
   }
 };
 
